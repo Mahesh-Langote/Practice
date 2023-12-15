@@ -11,7 +11,8 @@ app.set("views", path.join(__dirname, "/views"))
 
 
 app.get("/",(req, res)=>{
-    res.render("home.ejs")
+    let val = Math.floor(Math.random()*6)+1;
+    res.render("home.ejs", {num:val} )
     
 })
 app.get("/2", (req,res)=>{
