@@ -5,18 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Home</title>
     <style>
-        /* Add some basic styling for better presentation */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 20px;
+            background-color: #f8f8f8;
         }
 
         h1 {
             color: #333;
+            text-align: center;
+        }
+
+        #posts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-around;
+        }
+
+        .post {
+            max-width: 400px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.2s ease-in-out;
+            overflow: hidden;
+        }
+
+        .post:hover {
+            transform: scale(1.05);
+        }
+
+        .post img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .post-content {
+            max-height: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         #post-form {
             margin-top: 20px;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .file-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
         }
     </style>
 </head>
@@ -26,8 +120,11 @@
     <div id="posts">
         <% posts.forEach(post => { %>
             <div class="post">
+                <% if (post.imageUrl) { %>
+                    <img src="<%= post.imageUrl %>" alt="<%= post.title %>" onerror="this.style.display='none';">
+                <% } %>
                 <h2><%= post.title %></h2>
-                <p><%= post.content %></p>
+                <p class="post-content"><%= post.content %></p>
             </div>
         <% }); %>
     </div>
@@ -41,35 +138,64 @@
             <label for="post-content">Content:</label>
             <textarea id="post-content" name="postContent" required></textarea>
 
+            <div class="file-input-container">
+                <label for="post-image-url">Image URL:</label>
+                <input type="text" id="post-image-url" name="postImageUrl" placeholder="Enter Image URL">
+            </div>
+
+            <div class="file-input-container">
+                <label for="post-image-file">Upload Image:</label>
+                <input type="file" id="post-image-file" name="postImageFile" accept="image/*">
+            </div>
+
+            <div class="error-message" id="image-error-message"></div>
+
             <button type="submit">Submit Post</button>
         </form>
     </div>
 
     <script>
-        // Client-side JavaScript for handling form submission
         document.getElementById("new-post-form").addEventListener("submit", function(event) {
             event.preventDefault();
 
-            // Get values from the form
             const title = document.getElementById("post-title").value;
             const content = document.getElementById("post-content").value;
+            const imageUrl = document.getElementById("post-image-url").value;
+            const imageFile = document.getElementById("post-image-file").files[0];
 
             // Validate values (you can add more validation logic as needed)
 
             // Create a new post object
             const newPost = {
                 title: title,
-                content: content
+                content: content,
+                imageUrl: imageUrl || (imageFile ? URL.createObjectURL(imageFile) : null)
             };
+
+            // Display an error message if image URL is empty or if the image fails to load
+            const errorMessageElement = document.getElementById("image-error-message");
+            if (!newPost.imageUrl) {
+                errorMessageElement.textContent = "Image URL or file is required.";
+            } else {
+                errorMessageElement.textContent = "";
+            }
 
             // Add the new post to the posts list
             const postsContainer = document.getElementById("posts");
             const postElement = document.createElement("div");
             postElement.classList.add("post");
-            postElement.innerHTML = `
-                <h2>${newPost.title}</h2>
-                <p>${newPost.content}</p>
-            `;
+            if (newPost.imageUrl) {
+                postElement.innerHTML = `
+                    <img src="${newPost.imageUrl}" alt="${title}" onerror="this.style.display='none';">
+                    <h2>${title}</h2>
+                    <p class="post-content">${content}</p>
+                `;
+            } else {
+                postElement.innerHTML = `
+                    <h2>${title}</h2>
+                    <p class="post-content">${content}</p>
+                `;
+            }
             postsContainer.appendChild(postElement);
 
             // Clear the form
