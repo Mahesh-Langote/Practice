@@ -3,16 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Blog Home</title>
+    <style>
+        /* Add some basic styling for better presentation */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #post-form {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>hello</h1>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam eos veritatis omnis architecto earum id minima labore fuga, possimus delectus laudantium suscipit laboriosam aliquid facere vel ex velit commodi illum reprehenderit eum, tempore quod, enim veniam nesciunt. Impedit modi, quam officiis esse sit, dolores nesciunt, dolorem doloribus quae omnis beatae!\</p>
-    <button>OK</button>
-     
-    <p><%= Math.floor(Math.random() *6)+1 %> </p>
-    <h1>
-        <%= num %>
-    </h1>
+    <h1>Welcome to the Blog</h1>
+
+    <div id="posts">
+        <% posts.forEach(post => { %>
+            <div class="post">
+                <h2><%= post.title %></h2>
+                <p><%= post.content %></p>
+            </div>
+        <% }); %>
+    </div>
+
+    <div id="post-form">
+        <h2>Create a New Post</h2>
+        <form id="new-post-form">
+            <label for="post-title">Title:</label>
+            <input type="text" id="post-title" name="postTitle" required>
+
+            <label for="post-content">Content:</label>
+            <textarea id="post-content" name="postContent" required></textarea>
+
+            <button type="submit">Submit Post</button>
+        </form>
+    </div>
+
+    <script>
+        // Client-side JavaScript for handling form submission
+        document.getElementById("new-post-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Get values from the form
+            const title = document.getElementById("post-title").value;
+            const content = document.getElementById("post-content").value;
+
+            // Validate values (you can add more validation logic as needed)
+
+            // Create a new post object
+            const newPost = {
+                title: title,
+                content: content
+            };
+
+            // Add the new post to the posts list
+            const postsContainer = document.getElementById("posts");
+            const postElement = document.createElement("div");
+            postElement.classList.add("post");
+            postElement.innerHTML = `
+                <h2>${newPost.title}</h2>
+                <p>${newPost.content}</p>
+            `;
+            postsContainer.appendChild(postElement);
+
+            // Clear the form
+            document.getElementById("new-post-form").reset();
+        });
+    </script>
 </body>
 </html>
